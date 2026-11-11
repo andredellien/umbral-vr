@@ -4,6 +4,7 @@ name: client
 # UNITY_LICENSE, UNITY_EMAIL, UNITY_PASSWORD (https://game.ci/docs/github/activation)
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths: ['client/**', '.github/workflows/client.yml']
