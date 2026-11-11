@@ -4,7 +4,8 @@
   "references": [
     "Umbral.Core",
     "Umbral.Net",
-    "UnityEngine.UI"
+    "UnityEngine.UI",
+    "Unity.InputSystem"
   ],
   "autoReferenced": true
 }
