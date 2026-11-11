@@ -1,7 +1,7 @@
 {
   "name": "Umbral.Editor",
   "rootNamespace": "Umbral.EditorTools",
-  "references": ["Umbral.App", "Unity.InputSystem"],
+  "references": ["Umbral.App", "Unity.InputSystem", "Unity.XR.Management", "Unity.XR.Management.Editor", "Unity.XR.OpenXR"],
   "includePlatforms": ["Editor"],
   "autoReferenced": true
 }
