@@ -12,8 +12,8 @@ Sala de ventas inmersiva en realidad virtual para departamentos en preventa (Met
 ### Cliente (`client/`)
 - Proyecto Unity 6 (6000.6.8f1) con URP, OpenXR y XR Interaction Toolkit.
 - Lógica del negocio aislada en `Umbral.Core` (C# puro, sin dependencias de Unity):
-  - cálculo de precio = base de la unidad + diferencias de acabados, en bolivianos enteros;
-  - consultas sobre el catálogo.
+    - cálculo de precio = base de la unidad + diferencias de acabados, en bolivianos enteros;
+    - consultas sobre el catálogo.
 - Capa de red y caché (`Umbral.Net`): el catálogo carga desde el servidor, luego caché en disco y, como último recurso, un catálogo incluido en la app. La app funciona con el servidor apagado.
 - 10 pruebas automáticas en Unity, todas aprobadas, sin errores de compilación.
 
