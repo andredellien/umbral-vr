@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87646a25459a9454c83337e99bfed738, type: 3}
+  m_Name: set
+  m_EditorClassIdentifier: Umbral.App::Umbral.App.LightmapSet
+  label: mediodia
+  colors:
+  - {fileID: 2800000, guid: c821f2fa4fedb448a98b6521d7f61953, type: 3}
+  - {fileID: 2800000, guid: b875aadb0efc5422f8c10aafa7a726fa, type: 3}
+  - {fileID: 2800000, guid: f10b605356b8444deac3d1cbba7c55e0, type: 3}
