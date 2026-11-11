@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "validUntil": "2026-12-31",
+  "project": { "id": "demo", "name": "Edificio Demo" },
+  "units": [
+    { "id": "A-301", "floor": 3, "areaM2": 58, "basePrice": 520000 },
+    { "id": "A-1201", "floor": 12, "areaM2": 58, "basePrice": 565000 }
+  ],
+  "surfaces": [
+    {
+      "id": "floor",
+      "name": "Piso",
+      "options": [
+        { "id": "floor-ceramic", "name": "Cerámica", "delta": 0 },
+        { "id": "floor-porcelain-xl", "name": "Porcelanato de gran formato", "delta": 4200 },
+        { "id": "floor-wood", "name": "Piso de madera", "delta": 9800 }
+      ]
+    },
+    {
+      "id": "counter",
+      "name": "Mesón de cocina",
+      "options": [
+        { "id": "counter-laminate", "name": "Laminado", "delta": 0 },
+        { "id": "counter-granite", "name": "Granito", "delta": 3500 },
+        { "id": "counter-quartz", "name": "Cuarzo", "delta": 6200 }
+      ]
+    },
+    {
+      "id": "wall",
+      "name": "Pared",
+      "options": [
+        { "id": "wall-white", "name": "Blanco", "delta": 0 },
+        { "id": "wall-warm-grey", "name": "Gris cálido", "delta": 0 },
+        { "id": "wall-accent", "name": "Pared de acento", "delta": 1800 }
+      ]
+    }
+  ]
+}

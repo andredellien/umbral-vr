@@ -1,0 +1,61 @@
+name: client
+
+# Requiere que exista el proyecto Unity en client/ y los secrets de GameCI:
+# UNITY_LICENSE, UNITY_EMAIL, UNITY_PASSWORD (https://game.ci/docs/github/activation)
+
+on:
+  push:
+    branches: [main]
+    paths: ['client/**', '.github/workflows/client.yml']
+  pull_request:
+    paths: ['client/**', '.github/workflows/client.yml']
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/cache@v4
+        with:
+          path: client/Library
+          key: Library-test-${{ hashFiles('client/Packages/manifest.json', 'client/ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-test-
+      - uses: game-ci/unity-test-runner@v4
+        with:
+          projectPath: client
+          testMode: editmode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  build-android:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/cache@v4
+        with:
+          path: client/Library
+          key: Library-android-${{ hashFiles('client/Packages/manifest.json', 'client/ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-android-
+      - uses: game-ci/unity-builder@v4
+        with:
+          projectPath: client
+          targetPlatform: Android
+          androidExportType: androidPackage
+          versioning: Semantic
+      - uses: actions/upload-artifact@v4
+        with:
+          name: umbral-quest-apk
+          path: build/Android
+          retention-days: 30
+      # TODO semana 1: subir el APK al canal de lanzamiento de Meta (ovr-platform-util)
+      # o publicarlo como GitHub Release para sideload.

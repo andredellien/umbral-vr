@@ -1,0 +1,16 @@
+{
+  "name": "Umbral.Net",
+  "rootNamespace": "Umbral.Net",
+  "references": [
+    "Umbral.Core"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -1,0 +1,30 @@
+# Unity
+client/[Ll]ibrary/
+client/[Tt]emp/
+client/[Oo]bj/
+client/[Bb]uild/
+client/[Bb]uilds/
+client/[Ll]ogs/
+client/[Uu]ser[Ss]ettings/
+client/.vs/
+client/.idea/
+client/*.csproj
+client/*.sln
+client/*.apk
+client/*.aab
+client/*.keystore
+
+# Node
+node_modules/
+server/dist/
+server/coverage/
+.env
+.env.*
+
+# OS / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+client/*.slnx
+.atl/
