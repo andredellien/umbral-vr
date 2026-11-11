@@ -28,16 +28,13 @@ Equipo de 3 personas; el usuario lleva el desarrollo. Idioma de trabajo: españo
 
 ## Estado actual (Semana 1)
 
-Hecho y **sin ejecutar todavía** (se escribió sin red ni Unity): servidor `/health` y `/catalog` con 4 tests, `PriceCalculator`, `CatalogQueries`, `CatalogClient`, 10 tests EditMode, workflows de CI, docs.
+Hecho y verificado: servidor (4 tests, CI verde), proyecto Unity 6000.6.8f1 en `client/` (URP, XRI 3.7.0, OpenXR 1.19.0, Meta OpenXR 2.7.0), 10 tests EditMode y 1 test PlayMode pasan en local, escena `Boot` con `WristPrice` (muestra A-301 sin servidor), ajustes Android aplicados (menú `Umbral > Apply Android Quest Settings`), APK compila (`Umbral.EditorTools.BuildScript.Android`), repo público `andredellien/umbral-vr`, informe en `docs/AVANCE.md/.pdf`.
 
 Pendiente, en orden:
-1. `cd server && npm install && npm test`; commitear `package-lock.json`. Corregir lo que falle.
-2. Crear el proyecto Unity 6 (plantilla VR) en `client/` sin pisar `Assets/Umbral` ni `Assets/Resources`. Correr los 10 tests EditMode y corregir errores de compilación.
-3. Escena `Boot` con `WristPrice` (Canvas World Space en la muñeca izquierda): carga el catálogo y muestra el precio de la unidad `A-301`. Debe mostrar lo mismo con el servidor apagado.
-4. Ajustes Android para Quest: IL2CPP, ARM64, API 29+, ASTC, OpenXR + Meta Quest Support, "Allow downloads over HTTP" = Always allowed (para probar contra la IP local).
-5. Build and Run en el Quest y medir fps.
-6. Subir a GitHub, secrets de GameCI, desplegar el servidor a staging, canal de lanzamiento de Meta (verificar nombre y requisitos actuales).
-7. Spikes de 1 día: reloj solar con 4 sets de lightmaps y escena de presupuesto (100 draw calls / 500k triángulos).
+1. Build and Run en el Quest y medir fps (falta el visor en modo desarrollador). Ajustar posición del panel en la muñeca. Confirmar ASTC.
+2. CI del cliente en rojo: la licencia `.ulf` de la Mac está atada a la máquina (`Machine bindings don't match`) y el respaldo por email/contraseña falla. Investigar el flujo de activación de licencia personal de GameCI para Unity 6.
+3. Desplegar el servidor a staging (secret `DEPLOY_HOOK_URL`; hoy el deploy se omite) y canal de lanzamiento de Meta (verificar nombre y requisitos actuales).
+4. Spikes de 1 día: reloj solar con 4 sets de lightmaps y escena de presupuesto (100 draw calls / 500k triángulos).
 
 Criterio de salida de la Semana 1: alguien ajeno al equipo instala el build sin cable y ve el precio en la muñeca.
 Después sigue `docs/PLAN.md` semana a semana.
