@@ -43,6 +43,13 @@ namespace Umbral.EditorTools
             canvas.renderMode = RenderMode.WorldSpace;
             ((RectTransform)canvasGo.transform).sizeDelta = new Vector2(300, 200);
 
+            var bgGo = new GameObject("Background", typeof(Image));
+            bgGo.transform.SetParent(canvasGo.transform, false);
+            bgGo.GetComponent<Image>().color = new Color(0.05f, 0.07f, 0.12f, 0.85f);
+            var bgRt = (RectTransform)bgGo.transform;
+            bgRt.anchorMin = Vector2.zero; bgRt.anchorMax = Vector2.one;
+            bgRt.offsetMin = bgRt.offsetMax = Vector2.zero;
+
             var textGo = new GameObject("Label", typeof(Text));
             textGo.transform.SetParent(canvasGo.transform, false);
             var text = textGo.GetComponent<Text>();
@@ -57,6 +64,11 @@ namespace Umbral.EditorTools
             var so = new SerializedObject(canvasGo.GetComponent<WristPrice>());
             so.FindProperty("label").objectReferenceValue = text;
             so.ApplyModifiedPropertiesWithoutUndo();
+
+            // Piso de referencia (10x10 m) para tener sensación de escala al probar
+            var floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            floor.name = "Floor";
+            floor.transform.localScale = Vector3.one;
 
             System.IO.Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/Boot.unity");
