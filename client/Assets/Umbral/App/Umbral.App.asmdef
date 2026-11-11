@@ -1,0 +1,10 @@
+{
+  "name": "Umbral.App",
+  "rootNamespace": "Umbral.App",
+  "references": [
+    "Umbral.Core",
+    "Umbral.Net",
+    "UnityEngine.UI"
+  ],
+  "autoReferenced": true
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Umbral.Editor",
+  "rootNamespace": "Umbral.EditorTools",
+  "references": ["Umbral.App", "Unity.InputSystem"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

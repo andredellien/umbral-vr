@@ -1,0 +1,7 @@
+{
+  "name": "Umbral.App.Tests",
+  "references": ["Umbral.App", "UnityEngine.TestRunner", "UnityEditor.TestRunner", "UnityEngine.UI"],
+  "includePlatforms": [],
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "autoReferenced": false
+}
