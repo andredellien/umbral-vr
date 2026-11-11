@@ -7,15 +7,18 @@ namespace Umbral.EditorTools
 {
     public static class ImportSimulator
     {
-        [MenuItem("Umbral/Import XR Device Simulator")]
+        [MenuItem("Umbral/Import XRI Samples")]
         public static void Import()
         {
-            var sample = Sample.FindByPackage("com.unity.xr.interaction.toolkit", null)
-                .FirstOrDefault(s => s.displayName == "XR Device Simulator");
-            if (sample.displayName == null) throw new System.Exception("Sample no encontrado");
-            var ok = sample.Import(Sample.ImportOptions.OverridePreviousImports);
+            foreach (var name in new[] { "XR Device Simulator", "Starter Assets" })
+            {
+                var sample = Sample.FindByPackage("com.unity.xr.interaction.toolkit", null)
+                    .FirstOrDefault(s => s.displayName == name);
+                if (sample.displayName == null) throw new System.Exception($"Sample '{name}' no encontrado");
+                var ok = sample.Import(Sample.ImportOptions.OverridePreviousImports);
+                Debug.Log($"SIM_IMPORT {name} ok={ok}");
+            }
             AssetDatabase.Refresh();
-            Debug.Log("SIM_IMPORT ok=" + ok + " path=" + sample.importPath);
-        }
+                    }
     }
 }

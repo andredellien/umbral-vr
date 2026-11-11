@@ -17,7 +17,7 @@ namespace Umbral.EditorTools
             Directory.CreateDirectory(Path.GetDirectoryName(output) ?? ".");
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
             {
-                scenes = new[] { "Assets/Scenes/Boot.unity" },
+                scenes = System.Array.ConvertAll(System.Array.FindAll(EditorBuildSettings.scenes, x => x.enabled), x => x.path),
                 locationPathName = output,
                 target = BuildTarget.Android,
                 options = BuildOptions.None

@@ -28,7 +28,7 @@ Equipo de 3 personas; el usuario lleva el desarrollo. Idioma de trabajo: españo
 
 ## Estado actual (Semana 1)
 
-Hecho y verificado: servidor (4 tests, CI verde), proyecto Unity 6000.6.8f1 en `client/` (URP, XRI 3.7.0, OpenXR 1.19.0, Meta OpenXR 2.7.0), 10 tests EditMode y 1 test PlayMode pasan en local, escena `Boot` con `WristPrice` (muestra A-301 sin servidor), ajustes Android aplicados (menú `Umbral > Apply Android Quest Settings`), APK compila (`Umbral.EditorTools.BuildScript.Android`), repo público `andredellien/umbral-vr`, informe en `docs/AVANCE.md/.pdf`.
+Hecho y verificado: servidor (4 tests, CI verde), proyecto Unity 6000.6.8f1 en `client/` (URP, XRI 3.7.0, OpenXR 1.19.0, Meta OpenXR 2.7.0), 10 tests EditMode y 1 test PlayMode pasan en local, rig compartido `Assets/Umbral/Prefabs/UmbralRig.prefab` (solo teletransporte con fundido, giro 30° sin 180°, modo sentado vía tracking Device; menú `Umbral > Build Rig Prefab`), escena `Boot` y grey-box PROVISORIO `Apartment_Greybox` de 58 m² (el GDD no da plano; reemplazar medidas en `GreyboxBuilder.cs` cuando exista), `WristPrice` en el rig (muestra A-301 sin servidor), ajustes Android aplicados (menú `Umbral > Apply Android Quest Settings`), APK compila (`Umbral.EditorTools.BuildScript.Android`), repo público `andredellien/umbral-vr`, informe en `docs/AVANCE.md/.pdf`.
 
 Pendiente, en orden:
 1. Build and Run en el Quest y medir fps (falta el visor en modo desarrollador). Ajustar posición del panel en la muñeca. Confirmar ASTC.

@@ -5,7 +5,9 @@
     "Umbral.Core",
     "Umbral.Net",
     "UnityEngine.UI",
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "Unity.XR.CoreUtils",
+    "Unity.XR.Interaction.Toolkit"
   ],
   "autoReferenced": true
 }
