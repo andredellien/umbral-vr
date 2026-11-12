@@ -21,6 +21,9 @@ namespace Umbral.App
 
         private void OnDestroy() => interactable.selectEntered.RemoveAllListeners();
 
-        public void Press() => SceneFlow.GoTo(target);
+        public void Press()
+        {
+            if (!Session.Control.Paused) SceneFlow.GoTo(target);
+        }
     }
 }

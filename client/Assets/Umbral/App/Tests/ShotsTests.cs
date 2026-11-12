@@ -1,6 +1,7 @@
 using System.Collections;
 using System.IO;
 using NUnit.Framework;
+using Umbral.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -32,6 +33,70 @@ namespace Umbral.App.Tests
             Object.Destroy(tex);
             Object.Destroy(cam.gameObject);
             rt.Release();
+        }
+
+        private static void Snap(Camera cam, string file, string outDir)
+        {
+            var rt = new RenderTexture(1600, 900, 24);
+            var previous = cam.targetTexture;
+            cam.targetTexture = rt;
+            cam.Render();
+            RenderTexture.active = rt;
+            var tex = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
+            tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+            tex.Apply();
+            RenderTexture.active = null;
+            cam.targetTexture = previous;
+            Directory.CreateDirectory(outDir);
+            File.WriteAllBytes(Path.Combine(outDir, file), tex.EncodeToPNG());
+            Object.Destroy(tex);
+            rt.Release();
+        }
+
+        [UnityTest]
+        [Category("Shots")]
+        public IEnumerator CapturasSemana6()
+        {
+            var outDir = System.Environment.GetEnvironmentVariable("UMBRAL_SHOTS");
+            if (string.IsNullOrEmpty(outDir)) Assert.Ignore("Definí UMBRAL_SHOTS para sacar capturas");
+            if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) Assert.Ignore("Requiere GPU");
+            Session.Reset();
+
+            // Lobby legible desde donde se para el comprador (el círculo verde)
+            yield return Shot("Lobby", "s6-lobby.png", new Vector3(0f, 1.7f, 3.2f), new Vector3(0f, 1.6f, 5.7f), outDir);
+
+            // Pantalla del asesor reflejando una sesión (estado armado desde el catálogo, por un relay falso)
+#if UNITY_EDITOR
+            var op = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode("Assets/Scenes/Asesor.unity", new LoadSceneParameters(LoadSceneMode.Single));
+            while (!op.isDone) yield return null;
+            for (var i = 0; i < 3; i++) yield return null;
+            var view = Object.FindFirstObjectByType<AdvisorView>();
+            var fake = new FakeTransport();
+            view.Bind(new Umbral.Net.SessionLink(fake));
+            var catalog = JsonUtility.FromJson<Umbral.Core.Catalog>(Resources.Load<TextAsset>("catalog_seed").text);
+            var cfg = new Umbral.Core.Configurator(catalog, "A-1201");
+            cfg.Select("floor", "floor-wood");
+            cfg.Select("counter", "counter-quartz");
+            var flow = new Umbral.Core.SessionFlow();
+            flow.JumpTo(Umbral.Core.SessionStage.Llegada);
+            var snap = Umbral.Core.SessionSnapshot.Build("4821", flow, cfg, 2, false);
+            fake.Receive("{\"event\":\"joined\",\"data\":{\"code\":\"4821\"}}");
+            fake.Receive(JsonUtility.ToJson(new StateEnvelope { @event = "state", data = snap }));
+            Canvas.ForceUpdateCanvases();
+            yield return null;
+            yield return null;
+            Snap(Object.FindFirstObjectByType<Canvas>().worldCamera, "s6-asesor.png", outDir);
+#endif
+
+            // Visor en pausa: se renderiza con la cámara del propio rig, así entran el fundido y el cartel
+            yield return Shot("Apartment_Greybox", "s6-pausa-previa.png", new Vector3(1.45f, 1.6f, 0.4f), new Vector3(3.6f, 1.2f, 4f), outDir);
+            Session.Control.SetPaused(true);
+            var fade = Object.FindFirstObjectByType<Umbral.App.ComfortFade>();
+            var rigCamera = fade.GetComponentInParent<Camera>();
+            var timeout = Time.realtimeSinceStartup + 3f;
+            while (Time.realtimeSinceStartup < timeout) yield return null;
+            Snap(rigCamera, "s6-pausa.png", outDir);
+            Session.Control.SetPaused(false);
         }
 
         [UnityTest]

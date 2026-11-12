@@ -52,7 +52,7 @@ namespace Umbral.App
         {
             var unit = configurator.Unit;
             label.text = $"{unit.id}\n{unit.areaM2.ToString("0.#", CultureInfo.InvariantCulture)} m²\n" +
-                         $"{PriceFormat.Bolivianos(configurator.Total)}\nVigente hasta {configurator.Catalog.validUntil}";
+                         $"{PriceFormat.Bolivianos(configurator.Total)}\nVigente hasta {configurator.Catalog.validUntil}\nSala {SessionHost.Code}";
         }
     }
 }

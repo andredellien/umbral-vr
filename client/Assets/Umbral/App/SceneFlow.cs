@@ -23,7 +23,7 @@ namespace Umbral.App
         /// <summary>Oscurece, carga la escena de la etapa y la nueva escena aclara sola. Si la carga falla, la pantalla vuelve a verse.</summary>
         public static async void GoTo(SessionStage stage)
         {
-            if (Busy) return;
+            if (Busy || Session.Control.Paused) return; // en pausa nadie cambia de etapa: primero se reanuda
             Busy = true;
             var fade = UnityEngine.Object.FindFirstObjectByType<ComfortFade>();
             try

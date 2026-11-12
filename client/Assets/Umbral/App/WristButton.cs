@@ -31,6 +31,7 @@ namespace Umbral.App
         /// <summary>Lo llama el interactor y también las pruebas. Sin reloj o cinta en la escena (Boot) no hace nada.</summary>
         public void Press()
         {
+            if (Session.Control.Paused) return;
             if (kind == Kind.SolarStop) FindFirstObjectByType<SolarClock>()?.Select(stopIndex);
             else FindFirstObjectByType<TapeMeasure>(FindObjectsInactive.Include)?.Toggle();
         }

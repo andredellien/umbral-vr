@@ -7,7 +7,7 @@
     "UnityEngine.UI",
     "Umbral.Core",
     "Umbral.Net",
-    "Unity.XR.CoreUtils",
+    "Unity.XR.CoreUtils","Unity.InputSystem",
     "Unity.XR.Interaction.Toolkit"
   ],
   "includePlatforms": [],

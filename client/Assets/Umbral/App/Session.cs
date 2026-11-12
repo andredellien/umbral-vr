@@ -7,12 +7,16 @@ namespace Umbral.App
     {
         public static SessionFlow Flow { get; private set; } = new SessionFlow();
 
+        /// <summary>Pausa y órdenes del asesor.</summary>
+        public static SessionControl Control { get; private set; } = new SessionControl();
+
         /// <summary>La escena nueva se abre por el flujo: debe empezar en negro y aclarar, sin destello.</summary>
         public static bool EnteredByFlow { get; set; }
 
         public static void Reset()
         {
             Flow = new SessionFlow();
+            Control = new SessionControl();
             EnteredByFlow = false;
             SceneFlow.Busy = false;
         }

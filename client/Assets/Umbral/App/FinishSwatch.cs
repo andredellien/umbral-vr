@@ -47,7 +47,11 @@ namespace Umbral.App
         private void OnSelectEntered(UnityEngine.XR.Interaction.Toolkit.SelectEnterEventArgs _) => Choose();
 
         /// <summary>Elige esta opción. Lo llama el interactor y también las pruebas.</summary>
-        public void Choose() => configurator?.Select(surfaceId, optionId);
+        public void Choose()
+        {
+            if (Session.Control.Paused) return;
+            configurator?.Select(surfaceId, optionId);
+        }
 
         private async void Start()
         {
