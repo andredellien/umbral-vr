@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Lobby.unity
+    guid: 4751f243d526c46a4a93b3e5a61d8e8b
+  - enabled: 1
+    path: Assets/Scenes/Maqueta.unity
+    guid: 1d350d7c944144ae4a0230aac94879d6
+  - enabled: 1
     path: Assets/Scenes/Apartment_Greybox.unity
     guid: 55b71957b15494b12bb40b3ea5a9b800
   - enabled: 1

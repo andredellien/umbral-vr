@@ -3,10 +3,10 @@ using UnityEditor;
 
 namespace Umbral.EditorTools
 {
-    /// <summary>Lista de escenas del build, en orden. Por ahora el build arranca en el grey-box (nada carga escenas todavía, llega con el flujo de escenas de la semana 5); Boot queda como escena de prueba.</summary>
+    /// <summary>Lista de escenas del build, en orden: la sesión arranca en el lobby (índice 0) y sigue por el flujo (maqueta, llegada). Boot queda como escena de prueba.</summary>
     public static class SceneRegistry
     {
-        private static readonly string[] Scenes = { "Assets/Scenes/Apartment_Greybox.unity", "Assets/Scenes/Boot.unity" };
+        private static readonly string[] Scenes = { "Assets/Scenes/Lobby.unity", "Assets/Scenes/Maqueta.unity", "Assets/Scenes/Apartment_Greybox.unity", "Assets/Scenes/Boot.unity" };
 
         public static void Register()
         {
