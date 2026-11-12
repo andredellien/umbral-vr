@@ -99,6 +99,69 @@ namespace Umbral.App.Tests
             Session.Control.SetPaused(false);
         }
 
+        private static void Snap(string file, Vector3 pos, Vector3 look, string outDir)
+        {
+            var cam = new GameObject("ShotCam", typeof(Camera)).GetComponent<Camera>();
+            cam.transform.position = pos;
+            cam.transform.LookAt(look);
+            cam.fieldOfView = 70;
+            var rt = new RenderTexture(1600, 900, 24);
+            cam.targetTexture = rt;
+            cam.Render();
+            RenderTexture.active = rt;
+            var tex = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
+            tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+            tex.Apply();
+            RenderTexture.active = null;
+            Directory.CreateDirectory(outDir);
+            File.WriteAllBytes(Path.Combine(outDir, file), tex.EncodeToPNG());
+            Object.Destroy(tex);
+            Object.Destroy(cam.gameObject);
+            rt.Release();
+        }
+
+        private static IEnumerator WaitFor(System.Func<bool> condition, float seconds = 15f)
+        {
+            var timeout = Time.realtimeSinceStartup + seconds;
+            while (!condition() && Time.realtimeSinceStartup < timeout) yield return null;
+        }
+
+        // Requiere el servidor real (UMBRAL_SERVER): reserva A-301 con acabados elegidos y captura la ficha; después la maqueta con las reservadas en ámbar.
+        [UnityTest]
+        [Category("Shots")]
+        public IEnumerator CapturasSemana7()
+        {
+            var outDir = System.Environment.GetEnvironmentVariable("UMBRAL_SHOTS");
+            var server = System.Environment.GetEnvironmentVariable("UMBRAL_SERVER");
+            if (string.IsNullOrEmpty(outDir) || string.IsNullOrEmpty(server)) Assert.Ignore("Definí UMBRAL_SHOTS y UMBRAL_SERVER");
+            if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) Assert.Ignore("Requiere GPU");
+            Session.Reset();
+            SessionHost.ServerUrl = server;
+
+            SceneManager.LoadScene("Apartment_Greybox");
+            for (var i = 0; i < 40; i++) yield return null;
+            var host = Object.FindFirstObjectByType<ConfiguratorHost>();
+            yield return WaitFor(() => host.Ready.IsCompleted);
+            var configurator = host.Ready.Result;
+            configurator.Select("floor", "floor-wood");
+            configurator.Select("counter", "counter-quartz");
+            var button = Object.FindFirstObjectByType<ReserveButton>();
+            button.Press();
+            yield return WaitFor(() => button.LastOutcome != null);
+            for (var i = 0; i < 5; i++) yield return null;
+            Snap("s7-ficha.png", new Vector3(3.9f, 1.5f, 1.4f), new Vector3(3.9f, 1.3f, 3.0f), outDir);
+
+            Session.Reset();
+            SceneManager.LoadScene("Maqueta");
+            var board = Object.FindFirstObjectByType<MaquetaBoard>();
+            for (var i = 0; i < 10; i++) yield return null;
+            board = Object.FindFirstObjectByType<MaquetaBoard>();
+            yield return WaitFor(() => board.Loaded);
+            for (var i = 0; i < 20; i++) yield return null;
+            Snap("s7-maqueta-reservada.png", new Vector3(0.6f, 1.7f, 0.4f), new Vector3(0f, 1.2f, 3f), outDir);
+            SessionHost.ServerUrl = "http://localhost:3000";
+        }
+
         [UnityTest]
         [Category("Shots")]
         public IEnumerator CapturasSemana5()
