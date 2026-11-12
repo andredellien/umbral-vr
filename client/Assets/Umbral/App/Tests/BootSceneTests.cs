@@ -25,7 +25,7 @@ namespace Umbral.App.Tests
 
             Debug.Log("WRISTPRICE_TEXT=" + label.text.Replace("\n", " | "));
             StringAssert.Contains("A-301", label.text);
-            StringAssert.Contains("Bs", label.text);
+            StringAssert.IsMatch(@"Bs \d{1,3}(,\d{3})*", label.text); // formato fijo; el monto depende del catálogo de la corrida
         }
     }
 }

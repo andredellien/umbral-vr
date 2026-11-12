@@ -1,7 +1,11 @@
 using System.Collections.Generic;
+using System.IO;
+using Umbral.App;
+using Umbral.Core;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 
 namespace Umbral.EditorTools
@@ -20,7 +24,7 @@ namespace Umbral.EditorTools
         private static Gap Door(float a, float b) => new Gap { from = a, to = b, sill = 0f, top = DoorHeight };
         private static Gap Window(float a, float b) => new Gap { from = a, to = b, sill = 0.9f, top = 2.2f };
 
-        private static Material wallMat;
+        private static Material wallMat, swatchMat;
 
         [MenuItem("Umbral/Build Greybox Scene")]
         public static void Build()
@@ -43,18 +47,38 @@ namespace Umbral.EditorTools
             floor.GetComponent<Renderer>().sharedMaterial = floorMat;
             floor.AddComponent<TeleportationArea>().interactionLayers = BootSceneBuilder.TeleportLayer;
 
+            var host = new GameObject("Configurador", typeof(ConfiguratorHost)).GetComponent<ConfiguratorHost>();
+            floor.AddComponent<SurfaceTarget>().Setup("floor", host);
+
             // Exteriores: su cara interior queda justo en el perímetro (el interior libre es exactamente 7.25 x 8.00 m).
             // Se extienden 0.2 m a cada lado para cerrar las esquinas; los huecos se miden desde la esquina del apartamento.
             const float h = Thick / 2f;
             Wall(root, "S", -Thick, -h, Width + Thick, -h, Thick, Thick, Door(1.0f, 1.9f), Window(2.2f, 4.0f), Window(4.9f, 6.8f));
             Wall(root, "N", -Thick, Depth + h, Width + Thick, Depth + h, Thick, Thick, Window(1.0f, 2.4f), Window(5.6f, 6.8f));
-            Wall(root, "W", -h, -Thick, -h, Depth + Thick, Thick, Thick, Window(1.5f, 3.5f), Window(5.2f, 6.8f));
+            var westWall = new GameObject("Acabado_Pared_Oeste").transform;
+            westWall.SetParent(root);
+            westWall.gameObject.AddComponent<SurfaceTarget>().Setup("wall", host);
+            Wall(westWall, "W", -h, -Thick, -h, Depth + Thick, Thick, Thick, Window(1.5f, 3.5f), Window(5.2f, 6.8f));
             Wall(root, "E", Width + h, -Thick, Width + h, Depth + Thick, Thick, Thick, Window(1.0f, 3.4f), Window(5.5f, 7.0f));
             // Interiores
             Wall(root, "Privada", 0, 4.5f, Width, 4.5f, Thin, 0f, Door(2.0f, 2.9f), Door(3.5f, 4.3f), Door(5.3f, 6.1f));
             Wall(root, "Dorm1-Bano", 3.3f, 4.5f, 3.3f, Depth, Thin, 0f);
             Wall(root, "Bano-Dorm2", 4.9f, 4.5f, 4.9f, Depth, Thin, 0f);
             Wall(root, "Cocina", 4.5f, 0, 4.5f, 4.5f, Thin, 0f, new Gap { from = 0.8f, to = 3.8f, sill = 0f, top = WallHeight });
+
+            var counter = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            counter.name = "Meson";
+            counter.transform.SetParent(root);
+            counter.transform.position = new Vector3(5.9f, 0.45f, 0.3f); // contra la pared sur de la cocina, 0.6 m de fondo
+            counter.transform.localScale = new Vector3(2.6f, 0.9f, 0.6f);
+            counter.GetComponent<Renderer>().sharedMaterial = wallMat;
+            counter.AddComponent<SurfaceTarget>().Setup("counter", host);
+
+            var seed = JsonUtility.FromJson<Catalog>(File.ReadAllText("Assets/Resources/catalog_seed.json"));
+            swatchMat = MakeMaterial("Assets/Umbral/Prefabs/Greybox_Swatch.mat", Color.white);
+            Palette(root, host, seed, "floor", new Vector3(2.4f, 0f, 2.0f), new Vector3(1.45f, 0f, 1.2f));
+            Palette(root, host, seed, "wall", new Vector3(1.0f, 0f, 3.2f), new Vector3(2.5f, 0f, 3.2f));
+            Palette(root, host, seed, "counter", new Vector3(6.9f, 0f, 2.0f), new Vector3(6.0f, 0f, 2.0f));
 
             Label(root, "SALA-COMEDOR", 2.2f, 2.3f);
             Label(root, "COCINA", 5.9f, 2.3f);
@@ -71,6 +95,66 @@ namespace Umbral.EditorTools
             SceneRegistry.Register();
             AssetDatabase.SaveAssets();
             Debug.Log("GREYBOX_OK");
+        }
+
+        /// <summary>Poste con tablero y una muestra por opción de la superficie. El tablero mira hacia <paramref name="viewer"/>.</summary>
+        private static void Palette(Transform parent, ConfiguratorHost host, Catalog seed, string surfaceId, Vector3 pos, Vector3 viewer)
+        {
+            var surface = CatalogQueries.FindSurface(seed, surfaceId);
+            var n = surface.options.Length;
+            var away = pos - viewer;
+            away.y = 0f;
+            var root = new GameObject("Paleta_" + surfaceId).transform; // el texto se lee desde el lado -Z: miramos "alejándonos" del visitante
+            root.SetParent(parent);
+            root.position = pos;
+            root.rotation = Quaternion.LookRotation(away);
+
+            Part(root, PrimitiveType.Cylinder, "Poste", new Vector3(0f, 0.55f, 0.06f), new Vector3(0.04f, 0.55f, 0.04f), new Color(0.2f, 0.2f, 0.22f));
+            Part(root, PrimitiveType.Cube, "Tablero", new Vector3(0f, 1.25f, 0.06f), new Vector3(0.4f * n + 0.15f, 0.7f, 0.03f), new Color(0.15f, 0.15f, 0.17f));
+            Text(root, surface.name.ToUpperInvariant(), new Vector3(0f, 1.58f, 0f), 0.008f, Color.white);
+
+            for (var i = 0; i < n; i++)
+            {
+                var x = (i - (n - 1) / 2f) * 0.4f;
+                var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                go.name = "Muestra_" + surface.options[i].id;
+                go.transform.SetParent(root, false);
+                go.transform.localPosition = new Vector3(x, 1.3f, 0f);
+                go.transform.localScale = Vector3.one * 0.18f;
+                go.GetComponent<Renderer>().sharedMaterial = swatchMat;
+                go.AddComponent<XRSimpleInteractable>();
+                var label = Text(root, "", new Vector3(x, 1.15f, 0f), 0.0045f, Color.white);
+                go.AddComponent<FinishSwatch>().Setup(surfaceId, surface.options[i].id, host, label);
+            }
+        }
+
+        private static void Part(Transform parent, PrimitiveType type, string name, Vector3 localPos, Vector3 scale, Color color)
+        {
+            var go = GameObject.CreatePrimitive(type);
+            go.name = name;
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = localPos;
+            go.transform.localScale = scale;
+            Object.DestroyImmediate(go.GetComponent<Collider>()); // decorativo: no debe bloquear el rayo
+            go.GetComponent<Renderer>().sharedMaterial = MakeMaterial($"Assets/Umbral/Prefabs/Greybox_{name}.mat", color);
+        }
+
+        private static TextMesh Text(Transform parent, string text, Vector3 localPos, float charSize, Color color)
+        {
+            var go = new GameObject("Texto", typeof(TextMesh), typeof(MeshRenderer));
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = localPos;
+            var tm = go.GetComponent<TextMesh>();
+            var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            tm.font = font;
+            tm.text = text;
+            tm.anchor = TextAnchor.UpperCenter;
+            tm.alignment = TextAlignment.Center;
+            tm.characterSize = charSize;
+            tm.fontSize = 64;
+            tm.color = color;
+            go.GetComponent<MeshRenderer>().sharedMaterial = font.material;
+            return tm;
         }
 
         private static Material MakeMaterial(string path, Color color)
