@@ -38,7 +38,17 @@ export interface Catalog {
 export class CatalogService {
   private readonly path = join(__dirname, '..', '..', 'seed', 'catalog.json');
 
+  /** El seed tal cual (fuente de precios). No lleva las reservas: el seed no se modifica nunca. */
   get(): Catalog {
     return JSON.parse(readFileSync(this.path, 'utf8')) as Catalog;
+  }
+
+  /** El catálogo que ve el cliente: el seed con las unidades reservadas marcadas. Vendida sigue vendida. */
+  withReservations(reservedUnitIds: Set<string>): Catalog {
+    const catalog = this.get();
+    for (const u of catalog.units) {
+      if (reservedUnitIds.has(u.id) && (u.status ?? 'available') === 'available') u.status = 'reserved';
+    }
+    return catalog;
   }
 }

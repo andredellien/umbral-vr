@@ -1,9 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
+import { ReservationsService } from '../reservations/reservations.service';
 import { Catalog, CatalogService } from './catalog.service';
 
 @Controller()
 export class CatalogController {
-  constructor(private readonly catalog: CatalogService) {}
+  constructor(
+    private readonly catalog: CatalogService,
+    private readonly reservations: ReservationsService,
+  ) {}
 
   @Get('health')
   health() {
@@ -12,6 +16,6 @@ export class CatalogController {
 
   @Get('catalog')
   getCatalog(): Catalog {
-    return this.catalog.get();
+    return this.catalog.withReservations(this.reservations.reservedUnitIds());
   }
 }

@@ -14,6 +14,9 @@ Estado: aceptado. Se revisa si una decisión nos frena.
 | 8 | Código de lógica en `Umbral.Core` (C# puro, sin UnityEngine) | Se prueba sin abrir el editor y en CI |
 | 9 | Catálogo: red → caché en disco → seed incluido en el build | La app funciona sin internet, como pide el GDD |
 | 10 | La primera opción de cada superficie es la incluida en el precio base (delta 0) | Convención simple para calcular y mostrar "No incluido" |
+| 12 | Reservas y eventos se guardan en **archivos** (`server/data/`: `reservations.json` atómico y `events.jsonl`), no en PostgreSQL | No hay PostgreSQL ni Docker corriendo en la máquina de desarrollo; el contrato de `StoreService` es lo que se migra a una base después |
+| 13 | El servidor recalcula el total de una reserva y responde **409** si la unidad no está disponible; `GET /catalog` superpone las reservas al seed sin modificarlo | Nunca se confía en el precio del cliente y dos visores no pueden reservar la misma unidad |
+| 14 | Telemetría con cola local (JSONL, un GUID por evento) y `POST /events` con reintentos y deduplicación por id | La sesión funciona sin internet y un reintento no cuenta dos veces |
 
 ## Efecto sobre el GDD
 

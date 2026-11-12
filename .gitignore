@@ -28,3 +28,6 @@ Thumbs.db
 .idea/
 client/*.slnx
 .atl/
+
+# Datos locales del servidor (reservas y eventos)
+server/data/
