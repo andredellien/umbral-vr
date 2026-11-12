@@ -8,6 +8,9 @@ namespace Umbral.App
     {
         public string label;
         public Texture2D[] colors;
+        public Color ambient = new Color(0.5f, 0.55f, 0.6f); // luz ambiente para objetos dinámicos (muestras, paletas)
+        public Color skyTint = Color.gray;                    // tinte del panorama de la ventana
+        public float skyExposure = 1f;
 
         public LightmapData[] ToData()
         {

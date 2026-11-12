@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87646a25459a9454c83337e99bfed738, type: 3}
+  m_Name: set
+  m_EditorClassIdentifier: Umbral.App::Umbral.App.LightmapSet
+  label: tarde
+  colors:
+  - {fileID: 2800000, guid: 02498918377bc43128fb7554b8cb363c, type: 3}
+  - {fileID: 2800000, guid: 53014dcde2658419f9f40038642ccbca, type: 3}
+  - {fileID: 2800000, guid: 0f334d884a90e4fd892ec5068dd5529d, type: 3}
+  ambient: {r: 0.65, g: 0.55, b: 0.5, a: 1}
+  skyTint: {r: 0.6, g: 0.4, b: 0.3, a: 1}
+  skyExposure: 0.9

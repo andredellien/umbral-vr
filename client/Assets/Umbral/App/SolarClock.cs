@@ -10,26 +10,47 @@ namespace Umbral.App
     public class SolarClock : MonoBehaviour
     {
         [SerializeField] private LightmapSet[] sets;
-        [SerializeField] private int startIndex = 1; // media mañana, como en el GDD
+        [SerializeField] private int startIndex = 1; // mediodía (7, 12, 16 y 19 h)
         [SerializeField] private ComfortFade fade;   // opcional: cambia la luz con fundido a negro
 
-        public int Count => sets.Length;
+        public int Count => sets == null ? 0 : sets.Length;
         public int Current { get; private set; } = -1;
 
-        private void Start() => Apply(startIndex);
+        private Material sky;
+
+        private void Start()
+        {
+            if (fade == null) fade = FindFirstObjectByType<ComfortFade>(FindObjectsInactive.Include);
+            if (RenderSettings.skybox != null)
+            {
+                sky = new Material(RenderSettings.skybox); // copia: cambiar el original quedaría guardado en el proyecto
+                RenderSettings.skybox = sky;
+            }
+            Apply(startIndex);
+        }
 
         public void Apply(int index)
         {
             if (sets == null || sets.Length == 0) return;
             index = Mathf.Clamp(index, 0, sets.Length - 1);
             if (sets[index] == null || sets[index].colors == null) return;
-            LightmapSettings.lightmaps = sets[index].ToData();
+            var set = sets[index];
+            LightmapSettings.lightmaps = set.ToData();
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+            RenderSettings.ambientLight = set.ambient;
+            if (sky != null)
+            {
+                if (sky.HasProperty("_Tint")) sky.SetColor("_Tint", set.skyTint);
+                if (sky.HasProperty("_Exposure")) sky.SetFloat("_Exposure", set.skyExposure);
+            }
             Current = index;
         }
 
         /// <summary>Cambia de parada con fundido (si hay ComfortFade); si no, de golpe.</summary>
         public void Select(int index)
         {
+            if (index == Current) return;
+            if (fade != null && fade.Busy) return; // no pisar un fundido en curso (p. ej. el del teletransporte)
             if (fade != null) fade.FadeThrough(() => Apply(index)); // la corrutina vive en ComfortFade, no aquí
             else Apply(index);
         }

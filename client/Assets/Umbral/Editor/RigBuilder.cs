@@ -6,7 +6,9 @@ using Unity.XR.CoreUtils;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Turning;
@@ -40,6 +42,7 @@ namespace Umbral.EditorTools
 
             ConfigureLocomotion(rig);
             AddWristPrice(rig);
+            AddWristTools(rig);
             AddFade(rig);
             AddSeatedMode(rig);
 
@@ -114,6 +117,74 @@ namespace Umbral.EditorTools
             var so = new SerializedObject(canvasGo.GetComponent<WristPrice>());
             so.FindProperty("label").objectReferenceValue = text;
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private const string InputActionsPath = "Assets/Samples/XR Interaction Toolkit/3.7.0/Starter Assets/XRI Default Input Actions.inputactions";
+
+        private static Material UnlitMaterial(string name, Color color)
+        {
+            var path = $"Assets/Umbral/Prefabs/{name}.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m != null) return m;
+            m = new Material(Shader.Find("Universal Render Pipeline/Unlit")) { color = color };
+            AssetDatabase.CreateAsset(m, path);
+            return m;
+        }
+
+        /// <summary>Botones 3D en la muñeca izquierda (4 paradas del reloj solar + interruptor de la cinta) y la cinta métrica en el control derecho.</summary>
+        private static void AddWristTools(GameObject rig)
+        {
+            var left = rig.GetComponentsInChildren<Transform>(true).First(t => t.name == "Left Controller");
+            var right = rig.GetComponentsInChildren<Transform>(true).First(t => t.name == "Right Controller");
+
+            var colors = new[]
+            {
+                new Color(1f, 0.75f, 0.4f), new Color(1f, 0.95f, 0.6f), new Color(1f, 0.5f, 0.25f), new Color(0.3f, 0.4f, 0.85f),
+                new Color(0.3f, 0.85f, 0.4f),
+            };
+            var root = new GameObject("WristTools").transform;
+            root.SetParent(left, false);
+            // Fuera del radio de 0.1 m con que el Near-Far de esta misma mano busca interactuables: si no, apretar el grip izquierdo
+            // elegiría un botón sin querer (centros a >= 0.15 m del origen del control).
+            root.localPosition = new Vector3(0f, 0.15f, 0.02f);
+            root.localRotation = Quaternion.Euler(60f, 0f, 0f);
+
+            for (var i = 0; i < 5; i++)
+            {
+                var isTape = i == 4;
+                var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                go.name = isTape ? "Button_Cinta" : $"Button_Reloj_{SolarStops.Label(i)}";
+                go.transform.SetParent(root, false);
+                go.transform.localPosition = new Vector3((i - 2) * 0.05f, 0f, 0f);
+                go.transform.localScale = new Vector3(0.04f, 0.02f, 0.04f);
+                go.GetComponent<Renderer>().sharedMaterial = UnlitMaterial("Wrist_" + i, colors[i]);
+                go.AddComponent<XRSimpleInteractable>();
+                go.AddComponent<WristButton>().Setup(isTape ? WristButton.Kind.TapeToggle : WristButton.Kind.SolarStop, i);
+
+                var labelGo = new GameObject("Texto", typeof(TextMesh), typeof(MeshRenderer));
+                labelGo.transform.SetParent(root, false); // hijo del panel (sin escala) y no del cubo
+                labelGo.transform.localPosition = new Vector3((i - 2) * 0.05f, 0.0115f, 0f);
+                labelGo.transform.localRotation = Quaternion.Euler(90f, 0f, 0f); // tendido sobre el panel, legible desde arriba
+                var tm = labelGo.GetComponent<TextMesh>();
+                var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                tm.font = font;
+                tm.text = isTape ? "Cinta" : SolarStops.Label(i);
+                tm.anchor = TextAnchor.MiddleCenter;
+                tm.alignment = TextAlignment.Center;
+                tm.characterSize = 0.0028f;
+                tm.fontSize = 64;
+                tm.color = Color.black; // sobre la cara superior de cada botón
+                labelGo.GetComponent<MeshRenderer>().sharedMaterial = font.material;
+            }
+
+            var reference = AssetDatabase.LoadAllAssetsAtPath(InputActionsPath).OfType<InputActionReference>()
+                .FirstOrDefault(r => r.name == "XRI Right Interaction/Activate");
+            if (reference == null) throw new System.Exception("No se encontró la acción 'XRI Right Interaction/Activate'");
+            var tape = right.gameObject.AddComponent<TapeMeasure>();
+            var tip = new GameObject("TapeTip").transform; // punta del control: se mide desde acá, no desde el pivote dentro del mango
+            tip.SetParent(right, false);
+            tip.localPosition = new Vector3(0f, 0f, 0.06f);
+            tape.Setup(new InputActionProperty(reference), tip, UnlitMaterial("Tape", Color.yellow));
         }
 
         private static void AddFade(GameObject rig)

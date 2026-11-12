@@ -33,6 +33,8 @@ namespace Umbral.EditorTools
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             foreach (var cam in Object.FindObjectsByType<Camera>())
                 if (cam.transform.parent == null) Object.DestroyImmediate(cam.gameObject);
+            foreach (var light in Object.FindObjectsByType<Light>())
+                Object.DestroyImmediate(light.gameObject); // sin luz en tiempo real: el sol es horneado (GreyboxSolarBaker)
 
             wallMat = MakeMaterial("Assets/Umbral/Prefabs/Greybox_Wall.mat", new Color(0.82f, 0.82f, 0.8f));
             var floorMat = MakeMaterial("Assets/Umbral/Prefabs/Greybox_Floor.mat", new Color(0.55f, 0.55f, 0.55f));
@@ -45,6 +47,7 @@ namespace Umbral.EditorTools
             floor.transform.position = new Vector3(Width / 2f, -0.05f, Depth / 2f);
             floor.transform.localScale = new Vector3(Width, 0.1f, Depth); // solo el interior: no se puede aterrizar fuera
             floor.GetComponent<Renderer>().sharedMaterial = floorMat;
+            Static(floor);
             floor.AddComponent<TeleportationArea>().interactionLayers = BootSceneBuilder.TeleportLayer;
 
             var host = new GameObject("Configurador", typeof(ConfiguratorHost)).GetComponent<ConfiguratorHost>();
@@ -66,12 +69,22 @@ namespace Umbral.EditorTools
             Wall(root, "Bano-Dorm2", 4.9f, 4.5f, 4.9f, Depth, Thin, 0f);
             Wall(root, "Cocina", 4.5f, 0, 4.5f, 4.5f, Thin, 0f, new Gap { from = 0.8f, to = 3.8f, sill = 0f, top = WallHeight });
 
+            var ceiling = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            ceiling.name = "Ceiling";
+            ceiling.transform.SetParent(root);
+            ceiling.transform.position = new Vector3(Width / 2f, WallHeight + 0.05f, Depth / 2f);
+            ceiling.transform.localScale = new Vector3(Width + 2f * Thick, 0.1f, Depth + 2f * Thick);
+            ceiling.GetComponent<Renderer>().sharedMaterial = wallMat;
+            Static(ceiling);
+            Object.DestroyImmediate(ceiling.GetComponent<Collider>()); // no debe cortar el arco del teletransporte
+
             var counter = GameObject.CreatePrimitive(PrimitiveType.Cube);
             counter.name = "Meson";
             counter.transform.SetParent(root);
             counter.transform.position = new Vector3(5.9f, 0.45f, 0.3f); // contra la pared sur de la cocina, 0.6 m de fondo
             counter.transform.localScale = new Vector3(2.6f, 0.9f, 0.6f);
             counter.GetComponent<Renderer>().sharedMaterial = wallMat;
+            Static(counter);
             counter.AddComponent<SurfaceTarget>().Setup("counter", host);
 
             var seed = JsonUtility.FromJson<Catalog>(File.ReadAllText("Assets/Resources/catalog_seed.json"));
@@ -89,6 +102,10 @@ namespace Umbral.EditorTools
 
             var rig = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(RigBuilder.PrefabPath));
             rig.transform.position = new Vector3(1.45f, 0f, 1.2f); // dentro de la puerta de entrada, mirando al norte
+
+            var clockGo = new GameObject("SolarClock", typeof(SolarClock));
+            clockGo.transform.SetParent(root);
+            WindowView.Apply(); // panorama provisorio en la ventana
 
             System.IO.Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/Apartment_Greybox.unity");
@@ -157,6 +174,9 @@ namespace Umbral.EditorTools
             return tm;
         }
 
+        /// <summary>Solo la arquitectura aporta a la luz horneada; muestras, paletas y rótulos quedan dinámicos.</summary>
+        private static void Static(GameObject go) => GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.ContributeGI);
+
         private static Material MakeMaterial(string path, Color color)
         {
             var m = AssetDatabase.LoadAssetAtPath<Material>(path);
@@ -198,6 +218,7 @@ namespace Umbral.EditorTools
             go.transform.position = alongX ? new Vector3(x1 + mid, y0 + h / 2f, z1) : new Vector3(x1, y0 + h / 2f, z1 + mid);
             go.transform.localScale = alongX ? new Vector3(len, h, t) : new Vector3(t, h, len);
             go.GetComponent<Renderer>().sharedMaterial = wallMat;
+            Static(go);
         }
 
         private static void Label(Transform parent, string text, float x, float z)

@@ -25,6 +25,9 @@ namespace Umbral.App
 
         public float Alpha { get; private set; }
 
+        /// <summary>Hay un fundido en curso o la pantalla no está despejada: otros fundidos (reloj solar) deben esperar para no pisar el del teletransporte.</summary>
+        public bool Busy => running != null || teleportHold || Alpha > 0.001f;
+
         private void Awake()
         {
             block = new MaterialPropertyBlock();
