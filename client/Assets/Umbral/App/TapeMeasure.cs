@@ -89,6 +89,7 @@ namespace Umbral.App
         {
             EnsureVisuals();
             Active = !Active;
+            if (Active) Telemetry.Tool("tape", "on");
             if (!Active) Clear();
         }
 
@@ -114,6 +115,7 @@ namespace Umbral.App
             line.SetPosition(1, point);
             line.enabled = true;
             label.text = Measure.Format(LastCentimeters);
+            Telemetry.Tool("tape", LastCentimeters.ToString());
             label.transform.position = (first.Value + point) / 2f + Vector3.up * 0.05f;
             label.gameObject.SetActive(true);
         }

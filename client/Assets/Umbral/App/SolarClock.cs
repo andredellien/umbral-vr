@@ -1,3 +1,4 @@
+using Umbral.Core;
 using UnityEngine;
 
 namespace Umbral.App
@@ -51,6 +52,7 @@ namespace Umbral.App
         {
             if (index == Current) return;
             if (fade != null && fade.Busy) return; // no pisar un fundido en curso (p. ej. el del teletransporte)
+            Telemetry.Tool("solar", SolarStops.Label(index));
             if (fade != null) fade.FadeThrough(() => Apply(index)); // la corrutina vive en ComfortFade, no aquí
             else Apply(index);
         }

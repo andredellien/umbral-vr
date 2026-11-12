@@ -102,6 +102,7 @@ namespace Umbral.EditorTools
 
             var rig = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(RigBuilder.PrefabPath));
             rig.transform.position = new Vector3(1.45f, 0f, 1.2f); // dentro de la puerta de entrada, mirando al norte
+            ReserveStationBuilder.Add(null); // botón de reserva y ficha, delante de la entrada
             new GameObject("Llegada", typeof(ArrivalPoint)).transform.position = ArrivalPointTool.GreyboxDoor; // el flujo de escenas coloca al visitante aquí
 
             var clockGo = new GameObject("SolarClock", typeof(SolarClock));

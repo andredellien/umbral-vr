@@ -22,6 +22,7 @@ namespace Umbral.App
         private XRSimpleInteractable interactable;
 
         public string OptionId => optionId;
+        public string SurfaceId => surfaceId;
 
         public void Setup(string surface, string option, ConfiguratorHost owner, TextMesh text)
         {
@@ -50,7 +51,10 @@ namespace Umbral.App
         public void Choose()
         {
             if (Session.Control.Paused) return;
-            configurator?.Select(surfaceId, optionId);
+            if (configurator == null) return;
+            var changed = configurator.SelectedOptionId(surfaceId) != optionId;
+            configurator.Select(surfaceId, optionId);
+            if (changed) Telemetry.Log(TelemetryTypes.FinishChosen, e => { e.surface = surfaceId; e.option = optionId; });
         }
 
         private async void Start()

@@ -44,6 +44,7 @@ namespace Umbral.App
                 var load = SceneManager.LoadSceneAsync(SceneName(stage));
                 if (load == null) throw new InvalidOperationException($"No se pudo cargar la escena '{SceneName(stage)}'");
                 await load;
+                Telemetry.Log(TelemetryTypes.StageEntered);
             }
             catch (Exception e)
             {

@@ -31,6 +31,7 @@ namespace Umbral.App
         private void Awake()
         {
             block = new MaterialPropertyBlock();
+            TelemetryHost.Ensure();
             SessionHost.Ensure(); // todas las escenas con rig comparten un anfitrión de sala
             Apply(Session.ConsumeEntryFade() ? 1f : 0f); // escena abierta por el flujo: empieza en negro (sin destello) y aclara en Start
         }
