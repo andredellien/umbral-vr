@@ -49,11 +49,11 @@ namespace Umbral.EditorTools
         }
 
         /// <summary>Botón 3D (cubo seleccionable) con su rótulo delante.</summary>
-        public static GameObject Button(Transform parent, string name, string label, Vector3 pos, Vector3 scale, Color color)
+        public static GameObject Button(Transform parent, string name, string label, Vector3 pos, Vector3 scale, Color color, float labelSize = 0.006f)
         {
             var go = Block(parent, PrimitiveType.Cube, name, pos, scale, Mat("Flow_" + name, color));
             go.AddComponent<XRSimpleInteractable>();
-            Text(parent, label, pos + new Vector3(0f, 0f, -(scale.z / 2f + 0.005f)), 0.006f, Color.black);
+            Text(parent, label, pos + new Vector3(0f, 0f, -(scale.z / 2f + 0.005f)), labelSize, Color.black);
             return go;
         }
     }

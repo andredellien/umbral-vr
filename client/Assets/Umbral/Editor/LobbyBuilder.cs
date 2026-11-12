@@ -24,7 +24,7 @@ namespace Umbral.EditorTools
             var root = new GameObject("Lobby").transform;
             var floor = SceneParts.Block(root, PrimitiveType.Cube, "Floor", new Vector3(0f, -0.05f, 3f), new Vector3(10f, 0.1f, 10f), SceneParts.Mat("Lobby_Floor", new Color(0.78f, 0.8f, 0.84f)));
             floor.AddComponent<TeleportationArea>().interactionLayers = BootSceneBuilder.TeleportLayer;
-            SceneParts.Block(root, PrimitiveType.Cube, "Fondo", new Vector3(0f, 1.5f, 8.2f), new Vector3(10f, 3f, 0.2f), SceneParts.Mat("Lobby_Wall", new Color(0.9f, 0.9f, 0.92f)));
+            SceneParts.Block(root, PrimitiveType.Cube, "Fondo", new Vector3(0f, 1.5f, 5.9f), new Vector3(10f, 3f, 0.2f), SceneParts.Mat("Lobby_Wall", new Color(0.9f, 0.9f, 0.92f)));
 
             PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(RigBuilder.PrefabPath)); // en el origen, mirando a +Z
 
@@ -40,16 +40,20 @@ namespace Umbral.EditorTools
             body.isKinematic = true; // no cae si se suelta; solo hay que poder agarrarlo
             var grab = cube.AddComponent<XRGrabInteractable>();
 
-            var board = SceneParts.Text(root, "", new Vector3(0f, 2.1f, 7.9f), 0.012f, Color.black);
-            SceneParts.Block(root, PrimitiveType.Cube, "Tablero", new Vector3(0f, 2.1f, 8.0f), new Vector3(4.2f, 1.2f, 0.05f), SceneParts.Mat("Lobby_Board", new Color(0.97f, 0.97f, 0.97f)), false);
+            var board = SceneParts.Text(root, "", new Vector3(0f, 2.1f, 5.7f), 0.015f, Color.black);
+            SceneParts.Block(root, PrimitiveType.Cube, "Tablero", new Vector3(0f, 2.1f, 5.75f), new Vector3(4.6f, 1.2f, 0.05f), SceneParts.Mat("Lobby_Board", new Color(0.97f, 0.97f, 0.97f)), false);
 
             var director = new GameObject("Tutorial", typeof(TutorialDirector)).GetComponent<TutorialDirector>();
             director.Setup(aimInteractable, marker.transform, grab, board);
 
+            // Código de sala para el asesor, bajo el tablero (en el mundo, no fijo frente a los ojos)
+            var code = SceneParts.Text(root, "", new Vector3(0f, 1.45f, 5.7f), 0.015f, new Color(0.1f, 0.3f, 0.7f));
+            code.gameObject.AddComponent<RoomCodeLabel>();
+
             // Postura y salida, junto al tablero
-            SceneParts.Button(root, "Boton_DePie", "De pie", new Vector3(-0.9f, 1.0f, 7.5f), new Vector3(0.5f, 0.25f, 0.06f), new Color(0.75f, 0.85f, 1f)).AddComponent<SeatedButton>().Setup(false);
-            SceneParts.Button(root, "Boton_Sentado", "Sentado", new Vector3(-0.2f, 1.0f, 7.5f), new Vector3(0.5f, 0.25f, 0.06f), new Color(0.75f, 0.85f, 1f)).AddComponent<SeatedButton>().Setup(true);
-            SceneParts.Button(root, "Boton_Maqueta", "Ir a la maqueta", new Vector3(0.9f, 1.0f, 7.5f), new Vector3(0.8f, 0.25f, 0.06f), new Color(0.6f, 0.9f, 0.65f)).AddComponent<FlowButton>().Setup(SessionStage.Maqueta);
+            SceneParts.Button(root, "Boton_DePie", "De pie", new Vector3(-1.4f, 1.0f, 5.45f), new Vector3(0.7f, 0.35f, 0.06f), new Color(0.75f, 0.85f, 1f), 0.011f).AddComponent<SeatedButton>().Setup(false);
+            SceneParts.Button(root, "Boton_Sentado", "Sentado", new Vector3(-0.4f, 1.0f, 5.45f), new Vector3(0.8f, 0.35f, 0.06f), new Color(0.75f, 0.85f, 1f), 0.011f).AddComponent<SeatedButton>().Setup(true);
+            SceneParts.Button(root, "Boton_Maqueta", "Ir a la maqueta", new Vector3(0.9f, 1.0f, 5.45f), new Vector3(1.1f, 0.35f, 0.06f), new Color(0.6f, 0.9f, 0.65f), 0.011f).AddComponent<FlowButton>().Setup(SessionStage.Maqueta);
 
             System.IO.Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, ScenePath);
