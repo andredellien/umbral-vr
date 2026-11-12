@@ -19,6 +19,7 @@ export interface CatalogUnit {
   floor: number;
   areaM2: number;
   basePrice: number; // Bs enteros
+  status?: 'available' | 'reserved' | 'sold'; // ausente = disponible
 }
 
 export interface Catalog {

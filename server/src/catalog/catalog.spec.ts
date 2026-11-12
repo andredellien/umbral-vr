@@ -28,6 +28,13 @@ describe('CatalogService', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it('el estado de cada unidad es válido y hay al menos una disponible', () => {
+    for (const u of catalog.units) {
+      expect([undefined, 'available', 'reserved', 'sold']).toContain(u.status);
+    }
+    expect(catalog.units.some((u) => (u.status ?? 'available') === 'available')).toBe(true);
+  });
+
   it('tiene fecha de vigencia', () => {
     expect(catalog.validUntil).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });

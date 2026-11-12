@@ -48,15 +48,20 @@ namespace Umbral.Net
                 }
             }
 
+            // Sin servidor: la caché en disco, salvo que el seed del build sea de una versión mayor
+            // (una caché vieja sin los campos nuevos taparía el catálogo actualizado).
+            Catalog cached = null;
             if (File.Exists(cachePath))
             {
-                var cached = JsonUtility.FromJson<Catalog>(File.ReadAllText(cachePath));
-                if (cached != null && cached.units != null) return cached;
+                var parsed = JsonUtility.FromJson<Catalog>(File.ReadAllText(cachePath));
+                if (parsed != null && parsed.units != null) cached = parsed;
             }
 
-            var seed = Resources.Load<TextAsset>(SeedResource);
-            if (seed == null) throw new FileNotFoundException("Falta Assets/Resources/catalog_seed.json");
-            return JsonUtility.FromJson<Catalog>(seed.text);
+            var seedAsset = Resources.Load<TextAsset>(SeedResource);
+            var seed = seedAsset != null ? JsonUtility.FromJson<Catalog>(seedAsset.text) : null;
+            var best = CatalogQueries.PickFresher(cached, seed);
+            if (best == null) throw new FileNotFoundException("Falta Assets/Resources/catalog_seed.json");
+            return best;
         }
     }
 }
