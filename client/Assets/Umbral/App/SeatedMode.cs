@@ -15,11 +15,12 @@ namespace Umbral.App
 
         public bool Seated { get; private set; }
 
-        private void Start() => SetSeated(startSeated, ComfortSettings.StandingEyeHeight);
+        private void Start() => SetSeated(startSeated || Session.Flow.Seated, ComfortSettings.StandingEyeHeight); // la elección del lobby viaja entre escenas
 
         public void SetSeated(bool seated, float eyeHeight)
         {
             Seated = seated;
+            Session.Flow.Seated = seated;
             origin.RequestedTrackingOriginMode = seated
                 ? XROrigin.TrackingOriginMode.Device
                 : XROrigin.TrackingOriginMode.Floor;

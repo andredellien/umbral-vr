@@ -31,7 +31,12 @@ namespace Umbral.App
         private void Awake()
         {
             block = new MaterialPropertyBlock();
-            Apply(0f);
+            Apply(Session.ConsumeEntryFade() ? 1f : 0f); // escena abierta por el flujo: empieza en negro (sin destello) y aclara en Start
+        }
+
+        private void Start()
+        {
+            if (Alpha > 0.5f && running == null) FadeTo(0f, ComfortSettings.FadeInSeconds);
         }
 
         private void OnEnable()

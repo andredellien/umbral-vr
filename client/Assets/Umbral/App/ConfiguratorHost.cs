@@ -22,7 +22,7 @@ namespace Umbral.App
         private async Task<Configurator> LoadAsync()
         {
             var catalog = await CatalogClient.LoadAsync(serverUrl);
-            return new Configurator(catalog, unitId);
+            return new Configurator(catalog, Session.ResolveUnit(catalog, unitId)); // la unidad elegida en la maqueta, o la serializada si la escena se abre suelta
         }
     }
 }

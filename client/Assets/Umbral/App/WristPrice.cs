@@ -24,7 +24,7 @@ namespace Umbral.App
                 var host = FindFirstObjectByType<ConfiguratorHost>();
                 var c = host != null
                     ? await host.Ready
-                    : new Configurator(await CatalogClient.LoadAsync(serverUrl), unitId);
+                    : await FromCatalog();
                 if (this == null) return;
                 configurator = c;
                 configurator.Changed += Show;
@@ -35,6 +35,12 @@ namespace Umbral.App
                 label.text = "Sin catálogo";
                 Debug.LogError($"[WristPrice] {e.Message}");
             }
+        }
+
+        private async Awaitable<Configurator> FromCatalog()
+        {
+            var catalog = await CatalogClient.LoadAsync(serverUrl);
+            return new Configurator(catalog, Session.ResolveUnit(catalog, unitId));
         }
 
         private void OnDestroy()
