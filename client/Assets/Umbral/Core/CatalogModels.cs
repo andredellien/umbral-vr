@@ -19,6 +19,7 @@ namespace Umbral.Core
         public int floor;
         public float areaM2;
         public long basePrice; // bolivianos enteros
+        public string status;  // "available" | "sold" | "reserved"; vacío o ausente = disponible
     }
 
     [Serializable]

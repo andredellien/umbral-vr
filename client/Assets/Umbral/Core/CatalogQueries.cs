@@ -13,6 +13,25 @@ namespace Umbral.Core
             throw new ArgumentException($"Unidad desconocida '{unitId}'");
         }
 
+        /// <summary>Estado de venta de la unidad. Vacío, nulo o desconocido cuenta como disponible (catálogos viejos no traen el campo).</summary>
+        public static UnitStatus StatusOf(UnitInfo unit)
+        {
+            switch (unit.status)
+            {
+                case "sold": return UnitStatus.Sold;
+                case "reserved": return UnitStatus.Reserved;
+                default: return UnitStatus.Available;
+            }
+        }
+
+        /// <summary>Entre la caché en disco y el seed del build gana el de versión mayor; a igual versión, la caché (puede venir del servidor).</summary>
+        public static Catalog PickFresher(Catalog cached, Catalog seed)
+        {
+            if (cached == null) return seed;
+            if (seed == null) return cached;
+            return seed.version > cached.version ? seed : cached;
+        }
+
         public static SurfaceInfo FindSurface(Catalog catalog, string surfaceId)
         {
             foreach (var surface in catalog.surfaces)
