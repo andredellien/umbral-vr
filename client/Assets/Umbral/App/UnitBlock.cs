@@ -74,7 +74,8 @@ namespace Umbral.App
         /// <summary>Lo llama el interactor y también las pruebas.</summary>
         public void Press()
         {
-            if (catalog == null || !Session.Flow.SelectUnit(catalog, unitId)) return;
+            // Con un cambio de escena en curso o en pausa no se elige nada: así el precio no cambia a mitad de la transición.
+            if (catalog == null || SceneFlow.Busy || Session.Control.Paused || !Session.Flow.SelectUnit(catalog, unitId)) return;
             SceneFlow.GoTo(SessionStage.Llegada);
         }
     }

@@ -11,13 +11,16 @@ namespace Umbral.EditorTools
 {
     /// <summary>
     /// Maqueta del edificio sobre una mesa. Una torre con un bloque por unidad del catálogo (por piso); color y texto
-    /// los aplica <see cref="MaquetaBoard"/> en runtime. Cada piso mide 9 cm; los bloques son grandes (50 x 20 cm) para
-    /// que el agarre cercano de una mano (radio 10 cm) no caiga sobre la unidad vecina.
+    /// los aplica <see cref="MaquetaBoard"/> en runtime. Cada piso mide 11 cm y los bloques 12 cm de alto: entre unidades
+    /// de pisos que se llevan 3 pisos o más queda más de 20 cm de aire, el doble del radio de agarre cercano de una mano (10 cm),
+    /// y un agarre no cae sobre la unidad vecina. Solo hay bloques para las unidades del seed al generar la escena: las que
+    /// un servidor agregue después no aparecen hasta regenerarla (pendiente si el catálogo crece).
     /// </summary>
     public static class MaquetaBuilder
     {
         public const string ScenePath = "Assets/Scenes/Maqueta.unity";
-        private const float TableTop = 0.75f, FloorHeight = 0.09f, TowerZ = 3f, TowerDepth = 0.5f;
+        public const float UnitHeight = 0.12f;
+        private const float TableTop = 0.75f, FloorHeight = 0.11f, TowerZ = 3f, TowerDepth = 0.5f;
 
         [MenuItem("Umbral/Build Maqueta Scene")]
         public static void Build()
@@ -44,7 +47,7 @@ namespace Umbral.EditorTools
             foreach (var unit in seed.units)
             {
                 var y = TableTop + (unit.floor - 0.5f) * FloorHeight;
-                var block = SceneParts.Block(root, PrimitiveType.Cube, "Unidad_" + unit.id, new Vector3(0f, y, front - 0.03f), new Vector3(0.5f, 0.2f, 0.06f), SceneParts.Mat("Maqueta_Unit", Color.white));
+                var block = SceneParts.Block(root, PrimitiveType.Cube, "Unidad_" + unit.id, new Vector3(0f, y, front - 0.03f), new Vector3(0.5f, UnitHeight, 0.06f), SceneParts.Mat("Maqueta_Unit", Color.white));
                 var label = SceneParts.Text(root, unit.id, new Vector3(0f, y, front - 0.065f), 0.0055f, Color.black);
                 block.AddComponent<XRSimpleInteractable>();
                 block.AddComponent<UnitBlock>().Setup(unit.id, label);

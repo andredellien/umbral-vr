@@ -67,7 +67,7 @@ namespace Umbral.App
             else if (state == LocomotionState.Ended)
             {
                 teleportHold = false;
-                FadeTo(0f, ComfortSettings.FadeInSeconds);
+                if (!SceneFlow.Busy) FadeTo(0f, ComfortSettings.FadeInSeconds); // un cambio de escena en curso ya maneja el negro
             }
         }
 

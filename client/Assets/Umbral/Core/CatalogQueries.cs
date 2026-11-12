@@ -32,6 +32,10 @@ namespace Umbral.Core
             return seed.version > cached.version ? seed : cached;
         }
 
+        /// <summary>El catálogo del servidor se acepta salvo que sea de una versión menor que el seed del build (servidor sin actualizar).</summary>
+        public static bool AcceptServer(Catalog fromServer, Catalog seed) =>
+            fromServer != null && (seed == null || fromServer.version >= seed.version);
+
         public static SurfaceInfo FindSurface(Catalog catalog, string surfaceId)
         {
             foreach (var surface in catalog.surfaces)

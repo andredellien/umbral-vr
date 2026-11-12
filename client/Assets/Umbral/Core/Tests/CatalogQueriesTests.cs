@@ -66,5 +66,16 @@ namespace Umbral.Core.Tests
             Assert.AreEqual("ceramic", selection["floor"]);
             Assert.AreEqual("white", selection["wall"]);
         }
+
+        [Test]
+        public void AcceptServer_RechazaUnServidorMasViejoQueElSeed()
+        {
+            var seed = new Catalog { version = 2 };
+            Assert.IsFalse(CatalogQueries.AcceptServer(new Catalog { version = 1 }, seed));
+            Assert.IsTrue(CatalogQueries.AcceptServer(new Catalog { version = 2 }, seed));
+            Assert.IsTrue(CatalogQueries.AcceptServer(new Catalog { version = 3 }, seed));
+            Assert.IsTrue(CatalogQueries.AcceptServer(new Catalog { version = 1 }, null), "Sin seed no hay con qué comparar");
+            Assert.IsFalse(CatalogQueries.AcceptServer(null, seed));
+        }
     }
 }

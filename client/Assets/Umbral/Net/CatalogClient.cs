@@ -18,6 +18,8 @@ namespace Umbral.Net
         public static async Awaitable<Catalog> LoadAsync(string baseUrl, int timeoutSeconds = 5)
         {
             var cachePath = Path.Combine(Application.persistentDataPath, CacheFile);
+            var seedAsset = Resources.Load<TextAsset>(SeedResource);
+            var seed = seedAsset != null ? JsonUtility.FromJson<Catalog>(seedAsset.text) : null;
 
             if (!string.IsNullOrEmpty(baseUrl))
             {
@@ -33,8 +35,13 @@ namespace Umbral.Net
                         var fromServer = JsonUtility.FromJson<Catalog>(json);
                         if (fromServer != null && fromServer.units != null)
                         {
-                            File.WriteAllText(cachePath, json);
-                            return fromServer;
+                            // Un servidor desactualizado (versión menor que el seed) no se usa ni se cachea.
+                            if (CatalogQueries.AcceptServer(fromServer, seed))
+                            {
+                                CatalogCache.Write(cachePath, json);
+                                return fromServer;
+                            }
+                            Debug.LogWarning($"[Catalog] El servidor trae la versión {fromServer.version}, menor que la del build ({seed.version}): se ignora.");
                         }
                     }
                     else
@@ -50,15 +57,7 @@ namespace Umbral.Net
 
             // Sin servidor: la caché en disco, salvo que el seed del build sea de una versión mayor
             // (una caché vieja sin los campos nuevos taparía el catálogo actualizado).
-            Catalog cached = null;
-            if (File.Exists(cachePath))
-            {
-                var parsed = JsonUtility.FromJson<Catalog>(File.ReadAllText(cachePath));
-                if (parsed != null && parsed.units != null) cached = parsed;
-            }
-
-            var seedAsset = Resources.Load<TextAsset>(SeedResource);
-            var seed = seedAsset != null ? JsonUtility.FromJson<Catalog>(seedAsset.text) : null;
+            var cached = CatalogCache.TryRead(cachePath);
             var best = CatalogQueries.PickFresher(cached, seed);
             if (best == null) throw new FileNotFoundException("Falta Assets/Resources/catalog_seed.json");
             return best;

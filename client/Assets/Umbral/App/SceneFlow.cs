@@ -26,6 +26,7 @@ namespace Umbral.App
             if (Busy || Session.Control.Paused) return; // en pausa nadie cambia de etapa: primero se reanuda
             Busy = true;
             var fade = UnityEngine.Object.FindFirstObjectByType<ComfortFade>();
+            var previous = Session.Flow.Stage;
             try
             {
                 if (fade != null)
@@ -48,6 +49,7 @@ namespace Umbral.App
             {
                 Debug.LogException(e);
                 Session.EnteredByFlow = false;
+                Session.Flow.JumpTo(previous); // la etapa debe seguir coincidiendo con la escena que el usuario ve
                 if (fade != null) fade.FadeTo(0f, ComfortSettings.FadeInSeconds);
             }
             finally
